@@ -7,11 +7,11 @@ import librosa.display
 from scipy.signal import butter, filtfilt
 
 # 시리얼 포트 설정 (포트 이름과 전송 속도를 환경에 맞게 설정)
-py_serial = serial.Serial(port="COM11", baudrate=9600)
+py_serial = serial.Serial(port="COM8", baudrate=9600)
 time.sleep(3)  # 시리얼 포트가 열릴 때까지 대기
 
 # 텍스트 파일 경로 설정
-file_path = 'exhibition/test_3.txt'
+file_path = 'exhibition/wow.txt'
 
 # 텍스트 파일 열기 및 시리얼 포트에서 데이터 읽기
 with open(file_path, 'w') as f:  # 'a' 모드 대신 'w' 모드를 사용하여 파일을 새로 씀
