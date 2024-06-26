@@ -28,21 +28,24 @@ py_serial.close()
 data = []
 with open(file_path, 'r') as f:
     for line in f:
-        values = line.strip().split()
-        if len(values) == 2:
-            voltage1, voltage2 = map(float, values)
-            data.append(voltage1)  # 두 번째 전압 값(voltage2)을 사용하려면 여기를 변경
+        try:
+            voltage = float(line.strip())
+            data.append(voltage)
+        except ValueError:
+            print(f"Invalid line: {line}")
 
 data = np.array(data)
 
 # 샘플 레이트 설정 (예: 100Hz, 아두이노 코드의 데이터 전송 간격에 따라 설정)
 sample_rate = 100
 
-# 대역 통과 필터 적용
+# 대역 통과 필터 적용 함수
 def butter_bandpass(lowcut, highcut, fs, order=5):
     nyquist = 0.5 * fs
     low = lowcut / nyquist
     high = highcut / nyquist
+    if low <= 0 or high >= 1:
+        raise ValueError("Digital filter critical frequencies must be 0 < Wn < 1")
     b, a = butter(order, [low, high], btype='band')
     return b, a
 
@@ -53,7 +56,7 @@ def bandpass_filter(data, lowcut, highcut, fs, order=5):
 
 # 뇌파 신호의 잡음 제거를 위한 필터링 (0-50Hz 대역 통과 필터 적용)
 lowcut = 0.1  # 0Hz 대신 0.1Hz로 설정하여 필터링의 안정성 확보
-highcut = 50.0
+highcut = 45.0  # 나이퀴스트 주파수를 넘지 않도록 설정 (50Hz 대신 45Hz로 설정)
 filtered_data = bandpass_filter(data, lowcut, highcut, sample_rate, order=5)
 
 # 푸리에 변환 수행
